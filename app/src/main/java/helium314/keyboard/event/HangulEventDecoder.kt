@@ -157,9 +157,7 @@ object HangulEventDecoder {
     )
 
     private val LAYOUTS = mapOf(
-            "korean" to LAYOUT_DUBEOLSIK_STANDARD,
-            "korean_sebeolsik_390" to LAYOUT_SEBEOLSIK_390,
-            "korean_sebeolsik_final" to LAYOUT_SEBEOLSIK_FINAL
+            "korean" to LAYOUT_DUBEOLSIK_STANDARD
     )
 
 }

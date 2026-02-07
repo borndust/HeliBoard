@@ -16,7 +16,6 @@ class HangulCombiner : Combiner {
 
     override fun processEvent(previousEvents: ArrayList<Event>?, event: Event): Event {
         if (event.keyCode == KeyCode.SHIFT) return event
-        // previously we only used the combiner if codePoint > 0x1100 or codePoint == -1, but looks here it's not necessary
         val event = HangulEventDecoder.decodeSoftwareKeyEvent(event)
         if (Character.isWhitespace(event.codePoint)) {
             val text = combiningStateFeedback
@@ -52,131 +51,64 @@ class HangulCombiner : Combiner {
                 history.clear()
             } else {
                 when (jamo) {
-                    is HangulJamo.Consonant -> {
-                        val initial = jamo.toInitial()
-                        val final = jamo.toFinal()
-                        if (currentSyllable.initial != null && currentSyllable.medial != null) {
-                            if (currentSyllable.final == null) {
-                                val combination = COMBINATION_TABLE_DUBEOLSIK[currentSyllable.initial.codePoint to (initial?.codePoint ?: -1)]
-                                history +=
-                                    if (combination != null) {
-                                        currentSyllable.copy(initial = HangulJamo.Initial(combination))
-                                    } else {
-                                        if (final != null) {
-                                            currentSyllable.copy(final = final)
-                                        } else {
-                                            composingWord.append(currentSyllable.string)
-                                            history.clear()
-                                            HangulSyllable(initial = initial)
-                                        }
-                                    }
+                    is HangulJamo.Initial -> {
+                        if (currentSyllable.initial != null) {
+                            val combination = COMBINATION_TABLE_CUSTOM[currentSyllable.initial.codePoint to jamo.codePoint]
+                            if (combination != null && currentSyllable.medial == null && currentSyllable.final == null) {
+                                history[history.lastIndex] = currentSyllable.copy(initial = HangulJamo.Initial(combination))
                             } else {
-                                val pair = currentSyllable.final.codePoint to (final?.codePoint ?: -1)
-                                val combination = COMBINATION_TABLE_DUBEOLSIK[pair]
-                                history += if (combination != null) {
-                                    currentSyllable.copy(final = HangulJamo.Final(combination, combinationPair = pair))
-                                } else {
-                                    composingWord.append(currentSyllable.string)
-                                    history.clear()
-                                    HangulSyllable(initial = initial)
-                                }
+                                composingWord.append(currentSyllable.string)
+                                history.clear()
+                                history += HangulSyllable(initial = jamo)
                             }
                         } else {
-                            composingWord.append(currentSyllable.string)
-                            history.clear()
-                            history += HangulSyllable(initial = initial)
+                            history += currentSyllable.copy(initial = jamo)
                         }
+                    }
+                    is HangulJamo.Medial -> {
+                        if (currentSyllable.medial != null) {
+                            val combination = COMBINATION_TABLE_CUSTOM[currentSyllable.medial.codePoint to jamo.codePoint]
+                            if (combination != null && currentSyllable.final == null) {
+                                history[history.lastIndex] = currentSyllable.copy(medial = HangulJamo.Medial(combination))
+                            } else {
+                                composingWord.append(currentSyllable.string)
+                                history.clear()
+                                history += HangulSyllable(medial = jamo)
+                            }
+                        } else {
+                            history += currentSyllable.copy(medial = jamo)
+                        }
+                    }
+                    is HangulJamo.Final -> {
+                        if (currentSyllable.final != null) {
+                            val combination = COMBINATION_TABLE_CUSTOM[currentSyllable.final.codePoint to jamo.codePoint]
+                            if (combination != null) {
+                                history[history.lastIndex] = currentSyllable.copy(final = HangulJamo.Final(combination))
+                            } else {
+                                composingWord.append(currentSyllable.string)
+                                history.clear()
+                                history += HangulSyllable(final = jamo)
+                            }
+                        } else {
+                            history += currentSyllable.copy(final = jamo)
+                        }
+                    }
+                    is HangulJamo.Consonant -> {
+                        val initial = jamo.toInitial()
+                        composingWord.append(currentSyllable.string)
+                        history.clear()
+                        history += HangulSyllable(initial = initial)
                     }
                     is HangulJamo.Vowel -> {
                         val medial = jamo.toMedial()
-                        if (currentSyllable.final == null) {
-                            history +=
-                                if (currentSyllable.medial != null) {
-                                    val combination = COMBINATION_TABLE_DUBEOLSIK[currentSyllable.medial.codePoint to (medial?.codePoint ?: -1)]
-                                    if (combination != null) {
-                                        currentSyllable.copy(medial = HangulJamo.Medial(combination))
-                                    } else {
-                                        composingWord.append(currentSyllable.string)
-                                        history.clear()
-                                        HangulSyllable(medial = medial)
-                                    }
-                            } else {
-                                currentSyllable.copy(medial = medial)
-                            }
-                        } else if (currentSyllable.final.combinationPair != null) {
-                            val pair = currentSyllable.final.combinationPair
-
-                            history.removeAt(history.lastIndex)
-                            val final = HangulJamo.Final(pair.first)
-                            history += currentSyllable.copy(final = final)
-                            composingWord.append(syllable?.string ?: "")
-                            history.clear()
-                            val initial = HangulJamo.Final(pair.second).toConsonant()?.toInitial()
-                            val newSyllable = HangulSyllable(initial = initial)
-                            history += newSyllable
-                            history += newSyllable.copy(medial = medial)
-                        } else {
-                            history.removeAt(history.lastIndex)
-                            composingWord.append(syllable?.string ?: "")
-                            history.clear()
-                            val initial = currentSyllable.final.toConsonant()?.toInitial()
-                            val newSyllable = HangulSyllable(initial = initial)
-                            history += newSyllable
-                            history += newSyllable.copy(medial = medial)
-                        }
+                        composingWord.append(currentSyllable.string)
+                        history.clear()
+                        history += HangulSyllable(medial = medial)
                     }
-                    is HangulJamo.Initial -> {
-                        history +=
-                            if (currentSyllable.initial != null) {
-                                val combination = COMBINATION_TABLE_SEBEOLSIK[currentSyllable.initial.codePoint to jamo.codePoint]
-                                if (combination != null && currentSyllable.medial == null && currentSyllable.final == null) {
-                                    currentSyllable.copy(initial = HangulJamo.Initial(combination))
-                                } else {
-                                    composingWord.append(currentSyllable.string)
-                                    history.clear()
-                                    HangulSyllable(initial = jamo)
-                                }
-                            } else {
-                                currentSyllable.copy(initial = jamo)
-                            }
-                    }
-                    is HangulJamo.Medial -> {
-                        history +=
-                            if (currentSyllable.medial != null) {
-                                val combination = COMBINATION_TABLE_SEBEOLSIK[currentSyllable.medial.codePoint to jamo.codePoint]
-                                if (combination != null) {
-                                    currentSyllable.copy(medial = HangulJamo.Medial(combination))
-                                } else {
-                                    composingWord.append(currentSyllable.string)
-                                    history.clear()
-                                    HangulSyllable(medial = jamo)
-                                }
-                            } else {
-                                currentSyllable.copy(medial = jamo)
-                            }
-                    }
-                    is HangulJamo.Final -> {
-                        history +=
-                            if (currentSyllable.final != null) {
-                                val combination = COMBINATION_TABLE_SEBEOLSIK[currentSyllable.final.codePoint to jamo.codePoint]
-                                if (combination != null) {
-                                    currentSyllable.copy(final = HangulJamo.Final(combination))
-                                } else {
-                                    composingWord.append(currentSyllable.string)
-                                    history.clear()
-                                    HangulSyllable(final = jamo)
-                                }
-                            } else {
-                                currentSyllable.copy(final = jamo)
-                            }
-                    }
-                    // compiler bug? when it's not added, compiler complains that it's missing
-                    // but when added, linter (correctly) states it's unreachable anyway
                     is HangulJamo.NonHangul -> Unit
                 }
             }
         }
-
         return Event.createConsumedEvent(event)
     }
 
@@ -279,56 +211,35 @@ class HangulCombiner : Combiner {
     }
 
     companion object {
-        val COMBINATION_TABLE_DUBEOLSIK = mapOf<Pair<Int, Int>, Int>(
-                0x1169 to 0x1161 to 0x116a,
-                0x1169 to 0x1162 to 0x116b,
-                0x1169 to 0x1175 to 0x116c,
-                0x116e to 0x1165 to 0x116f,
-                0x116e to 0x1166 to 0x1170,
-                0x116e to 0x1175 to 0x1171,
-                0x1173 to 0x1175 to 0x1174,
-
-                0x11a8 to 0x11ba to 0x11aa,
-                0x11ab to 0x11bd to 0x11ac,
-                0x11ab to 0x11c2 to 0x11ad,
-                0x11af to 0x11a8 to 0x11b0,
-                0x11af to 0x11b7 to 0x11b1,
-                0x11af to 0x11b8 to 0x11b2,
-                0x11af to 0x11ba to 0x11b3,
-                0x11af to 0x11c0 to 0x11b4,
-                0x11af to 0x11c1 to 0x11b5,
-                0x11af to 0x11c2 to 0x11b6,
-                0x11b8 to 0x11ba to 0x11b9
-        )
-        val COMBINATION_TABLE_SEBEOLSIK = mapOf<Pair<Int, Int>, Int>(
-                0x1100 to 0x1100 to 0x1101,	// ㄲ
-                0x1103 to 0x1103 to 0x1104,	// ㄸ
-                0x1107 to 0x1107 to 0x1108,	// ㅃ
-                0x1109 to 0x1109 to 0x110a,	// ㅆ
-                0x110c to 0x110c to 0x110d,	// ㅉ
-
-                0x1169 to 0x1161 to 0x116a,	// ㅘ
-                0x1169 to 0x1162 to 0x116b,	// ㅙ
-                0x1169 to 0x1175 to 0x116c,	// ㅚ
-                0x116e to 0x1165 to 0x116f,	// ㅝ
-                0x116e to 0x1166 to 0x1170,	// ㅞ
-                0x116e to 0x1175 to 0x1171,	// ㅟ
-                0x1173 to 0x1175 to 0x1174,	// ㅢ
-
-                0x11a8 to 0x11a8 to 0x11a9,	// ㄲ
-                0x11a8 to 0x11ba to 0x11aa,	// ㄳ
-                0x11ab to 0x11bd to 0x11ac,	// ㄵ
-                0x11ab to 0x11c2 to 0x11ad,	// ㄶ
-                0x11af to 0x11a8 to 0x11b0,	// ㄺ
-                0x11af to 0x11b7 to 0x11b1,	// ㄻ
-                0x11af to 0x11b8 to 0x11b2,	// ㄼ
-                0x11af to 0x11ba to 0x11b3,	// ㄽ
-                0x11af to 0x11c0 to 0x11b4,	// ㄾ
-                0x11af to 0x11c1 to 0x11b5,	// ㄿ
-                0x11af to 0x11c2 to 0x11b6,	// ㅀ
-                0x11b8 to 0x11ba to 0x11b9,	// ㅄ
-                0x11ba to 0x11ba to 0x11bb	// ㅆ
-        )
+        val COMBINATION_TABLE_CUSTOM = mutableMapOf<Pair<Int, Int>, Int>().apply {
+            // Initial
+            listOf(0x1100 to 0x1103 to 0x1112, 0x1107 to 0x110C to 0x110A, 0x110B to 0x1100 to 0x110F, 0x110B to 0x1103 to 0x1110,
+                   0x110B to 0x1107 to 0x1111, 0x110B to 0x110C to 0x110D, 0x1109 to 0x1100 to 0x1101, 0x1109 to 0x1103 to 0x1104,
+                   0x1109 to 0x1107 to 0x1108, 0x1109 to 0x110C to 0x110E).forEach {
+                put(it.first.first to it.first.second, it.second)
+                put(it.first.second to it.first.first, it.second)
+            }
+            // Medial
+            listOf(0x1173 to 0x1175 to 0x1174, 0x1173 to 0x1162 to 0x1166, 0x1175 to 0x1162 to 0x1164, 0x1164 to 0x1173 to 0x1168,
+                   0x1166 to 0x1175 to 0x1168, 0x1174 to 0x1162 to 0x1168, 0x1169 to 0x1175 to 0x116C, 0x1169 to 0x1162 to 0x116D,
+                   0x116C to 0x1162 to 0x116B, 0x116D to 0x1175 to 0x116B, 0x1164 to 0x1169 to 0x116B, 0x116E to 0x1175 to 0x1171,
+                   0x116E to 0x1162 to 0x1172, 0x1171 to 0x1162 to 0x1170, 0x1172 to 0x1175 to 0x1170, 0x1164 to 0x116E to 0x1170,
+                   0x1161 to 0x1162 to 0x1163, 0x1165 to 0x1162 to 0x1167).forEach {
+                put(it.first.first to it.first.second, it.second)
+                put(it.first.second to it.first.first, it.second)
+            }
+            // Final
+            listOf(0x11BC to 0x11AB to 0x11AD, 0x11BC to 0x11AF to 0x11B6, 0x11BC to 0x11A8 to 0x11BF, 0x11BC to 0x11AE to 0x11C0,
+                   0x11BC to 0x11B8 to 0x11C1, 0x11B7 to 0x11AB to 0x11C2, 0x11B7 to 0x11AF to 0x11B1, 0x11B7 to 0x11A8 to 0x11B0,
+                   0x11B7 to 0x11AE to 0x11B4, 0x11B7 to 0x11B8 to 0x11A9, 0x11BA to 0x11AB to 0x11BB, 0x11BA to 0x11AF to 0x11B3,
+                   0x11BA to 0x11A8 to 0x11AA, 0x11BA to 0x11B8 to 0x11B9, 0x11BA to 0x11AE to 0x11B5, 0x11B8 to 0x11AF to 0x11B2,
+                   0x11AE to 0x11A8 to 0x11B2, 0x11B2 to 0x11BC to 0x11BD, 0x11C1 to 0x11AF to 0x11BD, 0x11B6 to 0x11B8 to 0x11BD,
+                   0x11B2 to 0x11BA to 0x11AC, 0x11B9 to 0x11AF to 0x11AC, 0x11B3 to 0x11B8 to 0x11AC, 0x11B2 to 0x11B7 to 0x11BE,
+                   0x11B4 to 0x11A8 to 0x11BE, 0x11B0 to 0x11AE to 0x11BE).forEach {
+                put(it.first.first to it.first.second, it.second)
+                put(it.first.second to it.first.first, it.second)
+            }
+        }.toMap()
         private fun createEventChainFromSequence(text: CharSequence, originalEvent: Event): Event {
             return Event.createSoftwareTextEvent(text, KeyCode.MULTIPLE_CODE_POINTS, originalEvent)
         }
