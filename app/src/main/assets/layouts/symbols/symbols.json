@@ -1,0 +1,48 @@
+[
+  [
+    { "label": "(", "width": 0.1 },
+    { "label": ")", "width": 0.1 },
+    { "label": "\u201C", "width": 0.1 },
+    { "label": "\u2018", "width": 0.1 },
+    { "type": "placeholder", "width": 0.1 },
+    { "type": "placeholder", "width": 0.1 },
+    { "label": "7", "width": 0.1 },
+    { "label": "8", "width": 0.1 },
+    { "label": "9", "width": 0.1 },
+    { "label": "+", "width": 0.1 }
+  ],
+  [
+    { "label": "%", "width": 0.1 },
+    { "label": "/", "width": 0.1 },
+    { "label": "-", "width": 0.1 },
+    { "label": "*", "width": 0.1 },
+    { "label": "symbol_alpha", "width": 0.1 },
+    { "label": "symbol_alpha", "width": 0.1 },
+    { "label": "4", "width": 0.1 },
+    { "label": "5", "width": 0.1 },
+    { "label": "6", "width": 0.1 },
+    { "label": "0", "width": 0.1 }
+  ],
+  [
+    { "label": "@", "width": 0.1 },
+    { "label": "?", "width": 0.1 },
+    { "label": ",", "width": 0.1 },
+    { "label": ".", "width": 0.1 },
+    { "label": "language_switch", "width": 0.1 },
+    { "label": "language_switch", "width": 0.1 },
+    { "label": "1", "width": 0.1 },
+    { "label": "2", "width": 0.1 },
+    { "label": "3", "width": 0.1 },
+    { "label": "=", "width": 0.1 }
+  ],
+  [
+    { "type": "placeholder", "width": 0.1 },
+    { "label": "numpad", "width": 0.1 },
+    { "type": "placeholder", "width": 0.1 },
+    { "label": "delete", "width": 0.2 },
+    { "label": "space", "width": 0.2 },
+    { "type": "placeholder", "width": 0.1 },
+    { "label": "action", "width": 0.1 },
+    { "type": "placeholder", "width": 0.1 }
+  ]
+]
