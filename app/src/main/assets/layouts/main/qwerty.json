@@ -1,5 +1,8 @@
 [
   [
+    { "label": " ", "width": 1.0 }
+  ],
+  [
     { "label": "q", "width": 0.1 },
     { "label": "w", "width": 0.1 },
     { "label": "e", "width": 0.1 },

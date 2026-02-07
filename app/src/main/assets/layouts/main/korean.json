@@ -1,39 +1,42 @@
 [
   [
-    { "label": "\u3141", "code": 4535, "width": 0.1 },
-    { "label": "\u3139", "code": 4357, "width": 0.1 },
-    { "label": "\u3134", "code": 4354, "width": 0.1 },
-    { "label": "\u3141", "code": 4358, "width": 0.1 },
-    { "type": "placeholder", "width": 0.1 },
-    { "type": "placeholder", "width": 0.1 },
-    { "label": "\u315C", "code": 4462, "width": 0.1 },
-    { "label": "\u3153", "code": 4453, "width": 0.1 },
-    { "label": "\u3137", "code": 4526, "width": 0.1 },
-    { "label": "\u3131", "code": 4520, "width": 0.1 }
+    { "label": " ", "width": 1.0 }
   ],
   [
-    { "label": "\u3147", "code": 4540, "width": 0.1 },
-    { "label": "\u3137", "code": 4355, "width": 0.1 },
-    { "label": "\u3131", "code": 4352, "width": 0.1 },
-    { "label": "\u3147", "code": 4363, "width": 0.1 },
-    { "label": "symbol", "width": 0.1 },
-    { "label": "symbol", "width": 0.1 },
-    { "label": "\u3161", "code": 4467, "width": 0.1 },
-    { "label": "\u3163", "code": 4469, "width": 0.1 },
-    { "label": "\u3150", "code": 4450, "width": 0.1 },
-    { "label": "\u3134", "code": 4523, "width": 0.1 }
+    { "label": "ㅁ", "code": 4535, "width": 0.1 },
+    { "label": "ㄹ", "code": 4357, "width": 0.1 },
+    { "label": "ㄴ", "code": 4354, "width": 0.1 },
+    { "label": "ㅁ", "code": 4358, "width": 0.1 },
+    { "type": "placeholder", "width": 0.1 },
+    { "type": "placeholder", "width": 0.1 },
+    { "label": "ㅜ", "code": 4462, "width": 0.1 },
+    { "label": "ㅓ", "code": 4453, "width": 0.1 },
+    { "label": "ㄷ", "code": 4526, "width": 0.1 },
+    { "label": "ㄱ", "code": 4520, "width": 0.1 }
   ],
   [
-    { "label": "\u3145", "code": 4538, "width": 0.1 },
-    { "label": "\u3148", "code": 4364, "width": 0.1 },
-    { "label": "\u3142", "code": 4359, "width": 0.1 },
-    { "label": "\u3145", "code": 4361, "width": 0.1 },
+    { "label": "ㅇ", "code": 4540, "width": 0.1 },
+    { "label": "ㄷ", "code": 4355, "width": 0.1 },
+    { "label": "ㄱ", "code": 4352, "width": 0.1 },
+    { "label": "ㅇ", "code": 4363, "width": 0.1 },
+    { "label": "symbol", "width": 0.1 },
+    { "label": "symbol", "width": 0.1 },
+    { "label": "ㅡ", "code": 4467, "width": 0.1 },
+    { "label": "ㅣ", "code": 4469, "width": 0.1 },
+    { "label": "ㅐ", "code": 4450, "width": 0.1 },
+    { "label": "ㄴ", "code": 4523, "width": 0.1 }
+  ],
+  [
+    { "label": "ㅅ", "code": 4538, "width": 0.1 },
+    { "label": "ㅈ", "code": 4364, "width": 0.1 },
+    { "label": "ㅂ", "code": 4359, "width": 0.1 },
+    { "label": "ㅅ", "code": 4361, "width": 0.1 },
     { "label": "language_switch", "width": 0.1 },
     { "label": "language_switch", "width": 0.1 },
-    { "label": "\u3157", "code": 4457, "width": 0.1 },
-    { "label": "\u314F", "code": 4449, "width": 0.1 },
-    { "label": "\u3142", "code": 4536, "width": 0.1 },
-    { "label": "\u3139", "code": 4527, "width": 0.1 }
+    { "label": "ㅗ", "code": 4457, "width": 0.1 },
+    { "label": "ㅏ", "code": 4449, "width": 0.1 },
+    { "label": "ㅂ", "code": 4536, "width": 0.1 },
+    { "label": "ㄹ", "code": 4527, "width": 0.1 }
   ],
   [
     { "type": "placeholder", "width": 0.1 },
